@@ -18,8 +18,8 @@ class ApiService {
   
   final Dio _dio = Dio(BaseOptions(
     baseUrl: baseUrl,
-    connectTimeout: const Duration(seconds: 10),
-    receiveTimeout: const Duration(seconds: 90),
+    connectTimeout: const Duration(seconds: 60),
+    receiveTimeout: const Duration(seconds: 120),
   ));
 
   Future<ContractAnalysisResponse> analyzePdf(List<int> bytes, String fileName) async {
