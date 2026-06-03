@@ -94,6 +94,18 @@ def split_into_sentences(text: str):
 def root():
     return {"status": "Car Lease AI Backend is running"}
 
+@app.post("/test-ocr-only")
+async def test_ocr_only(file: UploadFile = File(...)):
+    import traceback
+    try:
+        pdf_path = os.path.join(UPLOAD_DIR, file.filename)
+        with open(pdf_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+        text = extract_text(pdf_path)
+        return {"status": "success", "text_length": len(text)}
+    except Exception as e:
+        return {"status": "error", "error": str(e), "traceback": traceback.format_exc()}
+
 # =================================================
 # 🔐 AUTHENTICATION
 # =================================================
