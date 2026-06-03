@@ -41,4 +41,4 @@ COPY models/ /app/models/
 EXPOSE 8000
 
 # Run Uvicorn and bind to 0.0.0.0 and dynamically to the $PORT environment variable expected by Render
-CMD gunicorn backend.main:app -w 4 -k uvicorn.workers.UvicornWorker -b 0.0.0.0:${PORT:-8000}
+CMD gunicorn backend.main:app -w 1 -k uvicorn.workers.UvicornWorker -b 0.0.0.0:${PORT:-8000}
