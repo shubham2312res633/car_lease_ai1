@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../theme/colors.dart';
 import '../theme/text_styles.dart';
+import '../services/auth_service.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -42,6 +43,17 @@ class HomeScreen extends StatelessWidget {
                       Text('ContractAI', style: AppTextStyles.lg.copyWith(color: AppColors.primary)),
                       Text('AI-Powered Contract Analysis', style: AppTextStyles.xs),
                     ],
+                  ),
+                  const Spacer(),
+                  IconButton(
+                    icon: const Icon(Icons.logout, color: AppColors.mutedForeground),
+                    onPressed: () async {
+                      await authService.logout();
+                      if (context.mounted) {
+                        context.go('/login');
+                      }
+                    },
+                    tooltip: 'Logout',
                   ),
                 ],
               ),

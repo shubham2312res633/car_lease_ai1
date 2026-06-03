@@ -7,11 +7,17 @@ import 'screens/negotiation_chat_screen.dart';
 import 'screens/history_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/signup_screen.dart';
+import 'screens/splash_screen.dart';
 import 'models/contract_analysis_response.dart';
 
 final goRouter = GoRouter(
-  initialLocation: '/login',
+  initialLocation: '/splash',
   routes: [
+    GoRoute(
+      path: '/splash',
+      name: 'splash',
+      builder: (context, state) => const SplashScreen(),
+    ),
     GoRoute(
       path: '/login',
       name: 'login',

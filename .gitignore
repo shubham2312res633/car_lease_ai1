@@ -1,3 +1,15 @@
 
 # Environment Variables
 .env
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.db
+backend/users.db
+.venv/
+
+# Flutter/Dart (assuming carAi has its own, but just in case)
+.dart_tool/
+build/
