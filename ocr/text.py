@@ -1,19 +1,22 @@
 import os
+import sys
 from pdf2image import convert_from_path
 import pytesseract
 
 # =========================================================
-# 🔧 SYSTEM PATH CONFIGURATION (DO NOT CHANGE)
+# 🔧 SYSTEM PATH CONFIGURATION (DYNAMIC WINDOWS vs LINUX)
 # =========================================================
 
-# Absolute Poppler path (confirmed working)
-POPPLER_PATH = r"C:\Users\shubh\OneDrive\Desktop\car_lease_ai\poppler\Library\bin"
+IS_WINDOWS = sys.platform.startswith('win')
 
-# Absolute Tesseract path (required on Windows)
-pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
-
-print("🧰 Using Poppler from:", POPPLER_PATH)
-print("🔎 Using Tesseract from:", pytesseract.pytesseract.tesseract_cmd)
+POPPLER_PATH = None
+if IS_WINDOWS:
+    POPPLER_PATH = r"C:\Users\shubh\OneDrive\Desktop\car_lease_ai\poppler\Library\bin"
+    pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+    print("🧰 Running on Windows. Using Poppler from:", POPPLER_PATH)
+    print("🔎 Running on Windows. Using Tesseract from:", pytesseract.pytesseract.tesseract_cmd)
+else:
+    print("🧰 Running on Linux/Docker. Relying on system package paths.")
 
 # =========================================================
 # 📄 OCR FUNCTION
@@ -30,16 +33,23 @@ def extract_text(pdf_path: str) -> str:
     if not os.path.exists(pdf_path):
         raise FileNotFoundError(f"❌ PDF not found: {pdf_path}")
 
-    if not os.path.exists(POPPLER_PATH):
-        raise FileNotFoundError(f"❌ Poppler path not found: {POPPLER_PATH}")
+    # Only run path checks if on Windows
+    if IS_WINDOWS:
+        if not POPPLER_PATH or not os.path.exists(POPPLER_PATH):
+            raise FileNotFoundError(f"❌ Poppler path not found: {POPPLER_PATH}")
 
-    if not os.path.exists(pytesseract.pytesseract.tesseract_cmd):
-        raise FileNotFoundError(
-            f"❌ Tesseract not found: {pytesseract.pytesseract.tesseract_cmd}"
-        )
+        if not os.path.exists(pytesseract.pytesseract.tesseract_cmd):
+            raise FileNotFoundError(
+                f"❌ Tesseract not found: {pytesseract.pytesseract.tesseract_cmd}"
+            )
 
     # Convert PDF → images
-    pages = convert_from_path(pdf_path, poppler_path=POPPLER_PATH)
+    if IS_WINDOWS:
+        pages = convert_from_path(pdf_path, poppler_path=POPPLER_PATH)
+    else:
+        # On Linux, pdf2image resolves pdftoppm from the system PATH automatically
+        pages = convert_from_path(pdf_path)
+        
     print(f"🖼️ Total pages detected: {len(pages)}")
 
     full_text = ""
