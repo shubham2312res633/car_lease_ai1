@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:dio/dio.dart';
 import '../models/contract_analysis_response.dart';
 
@@ -6,8 +6,15 @@ class ApiService {
   static final String _devUrl = 'http://127.0.0.1:8000';
   static final String _prodUrl = 'https://car-lease-ai-backend.onrender.com';
   
-  // Use _prodUrl for deployment, _devUrl for local testing
-  static String get baseUrl => _devUrl;
+  static String get baseUrl {
+    if (kIsWeb) {
+      final host = Uri.base.host;
+      if (host == 'localhost' || host == '127.0.0.1') {
+        return _devUrl;
+      }
+    }
+    return _prodUrl;
+  }
   
   final Dio _dio = Dio(BaseOptions(
     baseUrl: baseUrl,

@@ -1,10 +1,18 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/foundation.dart';
 
 class AuthService {
-  // Use 127.0.0.1 for Web/Windows, or 10.0.2.2 if testing on Android Emulator
-  static const String baseUrl = 'http://127.0.0.1:8000';
+  static String get baseUrl {
+    if (kIsWeb) {
+      final host = Uri.base.host;
+      if (host == 'localhost' || host == '127.0.0.1') {
+        return 'http://127.0.0.1:8000';
+      }
+    }
+    return 'https://car-lease-ai-backend.onrender.com';
+  }
   static const String _tokenKey = 'jwt_token';
 
   Future<bool> register(String name, String email, String password) async {
