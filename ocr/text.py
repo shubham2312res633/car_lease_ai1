@@ -43,21 +43,31 @@ def extract_text(pdf_path: str) -> str:
                 f"❌ Tesseract not found: {pytesseract.pytesseract.tesseract_cmd}"
             )
 
-    # Convert PDF → images
+    from pdf2image import pdfinfo_from_path
+
+    # Get total page count
     if IS_WINDOWS:
-        pages = convert_from_path(pdf_path, poppler_path=POPPLER_PATH)
+        info = pdfinfo_from_path(pdf_path, poppler_path=POPPLER_PATH)
     else:
-        # On Linux, pdf2image resolves pdftoppm from the system PATH automatically
-        pages = convert_from_path(pdf_path)
+        info = pdfinfo_from_path(pdf_path)
         
-    print(f"🖼️ Total pages detected: {len(pages)}")
+    total_pages = info.get("Pages", 1)
+    print(f"🖼️ Total pages detected: {total_pages}")
 
     full_text = ""
 
-    for idx, page in enumerate(pages, start=1):
-        print(f"🔍 OCR processing page {idx}...")
-        text = pytesseract.image_to_string(page)
-        full_text += text + "\n"
+    for idx in range(1, total_pages + 1):
+        print(f"🔍 OCR processing page {idx}/{total_pages}...")
+        # Convert only one page at a time with a safe 150 DPI to save memory
+        if IS_WINDOWS:
+            pages = convert_from_path(pdf_path, dpi=150, first_page=idx, last_page=idx, poppler_path=POPPLER_PATH)
+        else:
+            pages = convert_from_path(pdf_path, dpi=150, first_page=idx, last_page=idx)
+            
+        if pages:
+            text = pytesseract.image_to_string(pages[0])
+            full_text += text + "\n"
+            pages[0].close()
 
     print("✅ OCR completed successfully.")
     return full_text
